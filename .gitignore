@@ -1,0 +1,21 @@
+# secrets and local-only files
+.env
+.env.*
+!.env.example
+.secrets/
+backup/
+supabase/.temp/
+.vercel/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# dependencies and build output
+node_modules/
+.next/
+out/
+*.log
+.DS_Store
+
+# test page (to be deleted; not versioned)
+scattered-notepad-spike/
