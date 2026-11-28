@@ -18,7 +18,7 @@
   - 계정이 없으면 https://vercel.com 에서 Hobby 플랜으로 가입합니다.
   - 이 세션에서 `! npx vercel login` 을 실행하고 브라우저에서 승인합니다.
   - Hobby는 비상업·개인 용도 제한이 있습니다. 개인 메모 용도로 쓰는 것이 맞는지는 본인 판단입니다.
-- [ ] **A4. 실기기 PWA 시험(B5 이후)** (진행 중: 2026-11-25 기준 세션 유지 양호, 7일째는 약 11-30)
+- [ ] **A4. 실기기 PWA 시험(B5 이후)** (진행 중: 2026-11-25 기준 세션 유지 양호, 7일째는 약 11-30. Android만 진행 중이며 iPhone은 나중에 시험하기로 함, 2026-11-29)
   - Android와 iPhone에서 제가 배포한 시험 URL을 열고, 홈 화면에 추가한 뒤 며칠 동안 로그인 유지 여부를 기록합니다.
   - 기록할 것: 설치 방법, 첫 실행 시간(체감), 1일·3일·7일 뒤 로그인 유지 여부.
 - [x] **A5. 로그인 계정 만들기(B3 이후)** (2026-11-23 완료, 사용자 1명·확인 완료)
@@ -39,7 +39,7 @@
 - [x] **B7. 내보내기 시험**: (2026-11-25 통과) 원본 29건과 복원본 29건의 행 내용 해시가 일치하고, `pg_trgm` 인덱스·RLS 정책도 복원됨. 임시 스키마 `restore_test`는 삭제 완료. **발견: `supabase db dump`는 Docker가 필요한데 이 PC에는 없어서 PostgreSQL 17 클라이언트를 설치하고 `pg_dump`로 대신함. 직접 연결 주소(`db.<ref>.supabase.co`)는 IPv6 전용이라 풀러(`aws-0-ap-northeast-2.pooler.supabase.com`, 사용자 `postgres.<ref>`)로 접속함.** 덤프 파일은 `backup/`에 있음(git 제외). DB 비밀번호는 `C:\mygit\pjy-dir\.env`의 `PGPASSWORD`에 있음(git 제외, 메모장으로 저장하면 줄 끝 `\r`이 붙으므로 읽을 때 제거해야 함)
 - [ ] **B8. 정리** (2026-11-25 진행: 브리프의 "미검증" 반영 완료. 삭제는 A4·B6 확인 뒤로 보류): 시험 테이블·페이지 삭제 여부를 확인받고 결과를 브리프의 "미검증" 3건에 반영
   - 삭제 후보: `public.spike_memos` 테이블, 시험 페이지 `scattered-notepad-spike`(Vercel 프로젝트와 폴더), `backup/`(필요하면 보관). **삭제 전에 사용자에게 다시 확인합니다.**
-  - **`public.keepalive()`는 지우지 않습니다.** 슬라이스 0의 접속 유지가 계속 씁니다. 단, 시험 페이지가 `anon` 키로 이 함수를 부르고 있으므로, `anon` 권한 회수는 시험 페이지를 없앤 뒤(또는 새 앱 cron이 돌기 시작한 뒤)에 합니다.
+  - **`public.keepalive()`는 지우지 않습니다.** 슬라이스 0의 접속 유지가 계속 씁니다. `anon` 권한도 회수하지 않습니다(2026-11-29 설계 리뷰 반영: 새 앱 cron도 `anon` 키로 부름).
   - DB 비밀번호를 평문 `.env`에 한동안 두었으므로, 시험이 끝나면 Supabase 대시보드에서 재설정하고 `.env`를 갱신합니다.
 
 ## D. egm 설계 진행 (2026-11-25)
@@ -50,7 +50,7 @@
 - [x] **D2. draft**: `/egm:egm-draft` 완료. 모순 2건 해소(iOS도 MVP 지원 대상, PRD·ROADMAP·용어집은 별도 문서 없이 브리프 133행 수정)
 - [x] **D3. 브리프 동기화** (2026-11-25 완료): 오늘의 구현 결정 일곱 개(Next.js 16, 서버 쿠키 세션, JSON 내보내기, `service_role`로 접속 유지 상태 기록, Tailwind CSS 단독, 운영 프로젝트의 시험용 계정으로 e2e, iOS 유지)를 브리프 "Key Decisions"에 추가
 - [x] **D3a. git 저장소** (2026-11-28 확인: `iwasthomas/scattered-notepad`, main 푸시됨): `scattered-notepad`(공개, 포트폴리오 겸 다른 PC 작업용). 시험 페이지(`scattered-notepad-spike/`)는 git에서 제외. 첫 커밋 전에 공개되는 문장 확인
-- [ ] **D4. review (사용자가 직접 입력)**: `/egm:egm-review docs/designs/scattered-notepad.md` (스킬이 사용자 입력으로만 실행됨)
+- [ ] **D4. review (사용자가 직접 입력)**: `/egm:egm-review docs/designs/scattered-notepad.md` (스킬이 사용자 입력으로만 실행됨) (2026-11-29 진행 중: Interactive 모드. Stage 5 반영·재검토 완료, Stage 6 완료, Stage 7 1라운드 지적 반영 완료. 보고서: `zoom_out_report.md`, `zoom_out_resolution_proposal.md`, `comprehension_report.md`, `critic_report.md`, `goldfish_review_report.md`)
 - [ ] **D5. resolve**: 리뷰 지적 사항을 항목별로 정리하고 반영할지 결정 (`/egm:egm-resolve`)
 - [ ] **D6. 설계 승인**: 사용자가 승인한 뒤에만 구현 시작
 
@@ -58,16 +58,31 @@
 
 앱 폴더는 `C:\mygit\pjy-dir\scattered-notepad\`(새로 만듦), DB 마이그레이션은 `supabase/migrations/`.
 
-- [ ] **E0. 쿠키 세션 시험 앱 (게이트)**: 로그인과 쿠키 세션만 있는 최소 Next.js 앱을 Vercel에 배포하고 Android·iPhone에서 1일·3일·7일 뒤 로그인 유지를 기록. 실패하면 클라이언트 세션으로 바꿔 다시 시험. 이 시험이 끝나기 전에는 나머지 화면을 만들지 않음. (DB 마이그레이션 E1은 병행 가능)
-- [ ] **E1. DB 마이그레이션 3개**: 핵심 스키마, RLS와 `GRANT`, 검색·완료 목록 함수. (`keepalive()` anon 권한 회수는 별도 파일로 나눠 시험 페이지 정리 뒤 적용)
+- [ ] **E0. 쿠키 세션 시험 앱 (게이트)**: 로그인과 쿠키 세션만 있는 최소 Next.js 앱을 Vercel에 배포하고 Android·iPhone에서 1일·3일·7일 뒤 로그인 유지를 기록. 실패하면 A4(시험 페이지 = 클라이언트 세션) 결과로 전환하고 다시 7일 시험하지 않음. 이 시험이 끝나기 전에는 나머지 화면을 만들지 않음. (DB 마이그레이션 E1은 병행 가능)
+- [ ] **E1. DB 마이그레이션 3개**: 핵심 스키마(분류 이력 트리거 포함), RLS와 `GRANT`, 검색·완료 목록 함수와 `keepalive()` 재정의(상태 기록)
 - [ ] **E2. 화면·서버 액션·임시 저장**: 입력, 검색, 분류철, 완료 목록, 보관함, 설정
-- [ ] **E3. 내보내기(JSON)와 접속 유지(cron, `service_role`)**, 서비스 워커
-- [ ] **E4. 시험**: 단위(Vitest), e2e(Playwright, `rls.spec.ts` 먼저), 빌드 결과에서 `service_role` 키 검색
-- [ ] **E5. 슬라이스 0 완료 조건**: 내보낸 JSON을 복원해 건수·해시 일치, 접속 유지 cron 자동 실행 기록 확인, iPhone·Android 세션 유지
+- [ ] **E3. 내보내기(JSON)와 JSON → Markdown 변환 스크립트, 접속 유지(cron, `anon` 키)**, 서비스 워커
+- [ ] **E4. 시험**: 단위(Vitest), e2e(Playwright, `rls.spec.ts` 먼저)
+- [ ] **E5. 슬라이스 0 완료 조건**: 내보낸 JSON을 Markdown으로 변환해 건수·해시 일치와 노트 도구에서 열리는지 확인, `system_status.last_ok_at`으로 cron 자동 실행 기록 확인, iPhone·Android 세션 유지
+
+- [ ] **E6. 접속 유지 cron 확인 준비**: 슬라이스 0 완료 확인 전에 시험 페이지(`scattered-notepad-spike`)의 Vercel cron을 끄고, 그 뒤 며칠 동안 `system_status.last_ok_at`이 매일 03:00~04:00 UTC에 바뀌는지 확인(설계 Verification Plan)
+
+### 운영 규칙 (슬라이스 0부터)
+- [ ] **주 1회 `pg_dump`**: 큰 마이그레이션 전에는 한 번 더. 덤프는 `backup/`(git 제외). 설계 Risks R1
+- [ ] **성공 기준 측정**: 슬라이스 0 사용 시작 뒤 한 달 동안 매주 금요일에 세 곳(Notepad++, 카톡 나에게 보내기, 삼성 Notes)에 새로 적은 메모 수와 완료 목록 참고 여부를 여기에 기록
+
+### 설계를 다시 고칠 계기 (2026-11-29 리뷰 반영 시 정리)
+결과가 나오면 설계 문서의 해당 부분을 갱신합니다.
+- [ ] **A4 Android 7일째(약 11-30)**: 결과를 Open Questions "세션 유지 기간"과 "슬라이스 0의 첫 단계"에 반영
+- [ ] **iPhone 시험(시기 미정, 작성자 결정: 나중에)**: 끝나야 슬라이스 0 완료 가능. 결과를 Open Questions iOS, 게이트 기간(최대 14일)에 반영
+- [ ] **E0 쿠키 세션 게이트 결과**: 실패해 클라이언트 세션으로 바꾸면 Alternative J, NFR 성능, Risks R3·R4, 파일 6·7·13(proxy·레이아웃)을 다시 씀
+- [ ] **egm-review 남은 단계(Stage 7 재검토, 8, 9)**: 새 지적 반영
+- [ ] **슬라이스 0 사용 중 측정**: 두 글자 검색 속도(Risks R10), 내보내기 시간(R7), 48시간 경고 기준, 콜드 스타트 시간
+- [ ] **슬라이스 1·2 설계**: 가져오기 이력 구분, 분류 확정 방식 열
 
 ### 사용자가 직접 할 일 (E 단계)
 - [ ] **시험용 계정 만들기**: Supabase 대시보드 Authentication > Users에서 시험 전용 이메일 사용자 추가(가입 차단은 유지). 운영 계정과 이메일을 다르게 하고, 비밀번호는 `scattered-notepad\.env.test.local`에만 저장
-- [ ] **Vercel 환경 변수 등록**: `SUPABASE_SERVICE_ROLE_KEY`(Sensitive), `CRON_SECRET`. 값은 채팅에 붙여 넣지 않음
+- [ ] **Vercel 환경 변수 등록**: `CRON_SECRET`. 값은 채팅에 붙여 넣지 않음
 - [ ] **실기기 기록**: E0의 1일·3일·7일 로그인 유지 결과를 알려 주기
 
 ## C. 판정 기준

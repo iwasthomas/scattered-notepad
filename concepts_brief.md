@@ -133,8 +133,8 @@ Keep, Joplin, Obsidian(+ Tasks 플러그인), Notion 같은 기존 도구가 동
 * **(2026-11-25 결정) 구현 방식:** 설계 문서(`docs/designs/scattered-notepad.md`)의 Technical Plan에 근거와 대안이 있습니다.
   * 화면: Next.js 16(App Router)과 React. 작성자가 React·Next.js를 공부 중이고 포트폴리오로 쓰려는 목적입니다.
   * 로그인 세션: 서버 쿠키 세션(`@supabase/ssr`). 홈 화면 앱에서의 유지는 시험한 적이 없어서, 슬라이스 0의 첫 단계로 7일 시험을 하고 실패하면 클라이언트 세션으로 바꿉니다.
-  * 내보내기: JSON 한 파일. 다른 도구로 옮기려면 변환 스크립트가 따로 필요합니다.
-  * 접속 유지 상태 표시: cron이 `service_role` 키로 상태 테이블에 기록합니다. RLS를 우회하는 비밀 키가 하나 생깁니다.
+  * 내보내기: JSON 한 파일. 다른 도구로 옮기는 변환(JSON → Markdown)은 앱 밖 스크립트로 슬라이스 0에 만들고 완료 시험에 씁니다(2026-11-29 설계 리뷰 반영). 앱 DB 백업·복원은 `pg_dump`가 맡습니다.
+  * 접속 유지 상태 표시: ~~cron이 `service_role` 키로 상태 테이블에 기록~~ → (2026-11-29 설계 리뷰 반영) DB 함수 `keepalive()`가 상태 테이블에 마지막 성공 시각을 직접 기록하고, cron은 `anon` 키로 부릅니다. RLS를 우회하는 키를 쓰지 않습니다.
   * 스타일링: Tailwind CSS 단독(shadcn/ui는 쓰지 않음).
   * 시험: Vitest와 Playwright. e2e는 운영 Supabase 프로젝트의 시험용 계정으로 하고, Docker가 없어 로컬 Supabase는 쓰지 않습니다.
   * iOS: 브리프의 "사용 기기: Android와 iOS 둘 다"를 유지합니다. iPhone 홈 화면 앱의 세션 유지가 슬라이스 0의 필수 통과 조건입니다.
