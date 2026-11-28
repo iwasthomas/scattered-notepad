@@ -2,6 +2,8 @@
 
 목적: 브리프의 미검증 3건(`pg_trgm`·한글 검색, 가입 차단, PWA 세션 유지)을 실제로 시험하고, PRD 작성 전에 Supabase·Vercel 환경을 준비합니다.
 
+여러 기기(개인 PC, 노트북, 모바일)에서 이어 작업할 때는 git 저장소(`main` 또는 작업 브랜치)가 기준입니다. 세션을 닫기 전에 커밋하고 푸시합니다.
+
 보안 원칙: DB 비밀번호, 액세스 토큰, 서비스 키는 채팅에 붙여 넣지 않습니다. 로그인은 아래 `!` 명령으로 이 세션 안에서 하고, 키는 환경 변수나 `.env` 파일에만 둡니다.
 
 ## A. 사용자가 직접 할 일
@@ -33,7 +35,7 @@
 - [x] **B3. 가입 차단**: (2026-11-23 통과) `supabase config pull`로 원격 설정을 가져온 뒤 `enable_signup = false`만 바꿔 push. 가입 API가 `signup_disabled`(HTTP 422)로 거부됨. 원격과 로컬 설정 차이 0.
 - [x] **B4. RLS 시험**: (2026-11-23 통과) 비로그인(anon) 읽기·쓰기·삭제 모두 `permission denied`(401). 로그인 사용자 시뮬레이션: 소유자 24건 조회, 다른 사용자 0건·남의 user_id로 쓰기 거부·남의 행 삭제 0건. **발견: 이 프로젝트는 새 테이블에 `anon`·`authenticated` 권한이 기본으로 없어서, 앱 테이블마다 `GRANT ... TO authenticated`를 명시해야 함.**
 - [x] **B5. PWA 시험 페이지 배포**: (2026-11-23 배포 완료) https://scattered-notepad-spike.vercel.app — 소스는 `C:\mygit\pjy-dir\scattered-notepad-spike\`, Git 없이 `vercel deploy --prod`로 배포. manifest·service worker·아이콘·로그인·메모 저장 포함, `anon` 공개 키만 사용. 실제 로그인·저장 확인과 세션 유지 기록은 A4(사용자)에서 진행.
-- [ ] **B6. keep-alive 시험** (2026-11-25 수동 호출 통과: `public.keepalive()` RPC와 `/api/keepalive`가 DB 시각을 반환하고 Vercel 함수 로그에 기록됨. cron `0 3 * * *` 등록 확인. **남음: cron의 첫 자동 실행 기록을 11-26 03:00 UTC(한국 시간 12:00) 이후 확인.** `keepalive()` 함수는 슬라이스 0에서 계속 쓰므로 B8에서 지우지 않음): Vercel cron(하루 1회)이 Supabase에 실제 DB 쿼리를 보내는 함수를 호출하는지 확인
+- [ ] **B6. keep-alive 시험** (**2026-11-28: 11-26 이후 cron 자동 실행 기록 확인 필요. Vercel 로그는 PC 세션이나 대시보드에서 확인**) (2026-11-25 수동 호출 통과: `public.keepalive()` RPC와 `/api/keepalive`가 DB 시각을 반환하고 Vercel 함수 로그에 기록됨. cron `0 3 * * *` 등록 확인. **남음: cron의 첫 자동 실행 기록을 11-26 03:00 UTC(한국 시간 12:00) 이후 확인.** `keepalive()` 함수는 슬라이스 0에서 계속 쓰므로 B8에서 지우지 않음): Vercel cron(하루 1회)이 Supabase에 실제 DB 쿼리를 보내는 함수를 호출하는지 확인
 - [x] **B7. 내보내기 시험**: (2026-11-25 통과) 원본 29건과 복원본 29건의 행 내용 해시가 일치하고, `pg_trgm` 인덱스·RLS 정책도 복원됨. 임시 스키마 `restore_test`는 삭제 완료. **발견: `supabase db dump`는 Docker가 필요한데 이 PC에는 없어서 PostgreSQL 17 클라이언트를 설치하고 `pg_dump`로 대신함. 직접 연결 주소(`db.<ref>.supabase.co`)는 IPv6 전용이라 풀러(`aws-0-ap-northeast-2.pooler.supabase.com`, 사용자 `postgres.<ref>`)로 접속함.** 덤프 파일은 `backup/`에 있음(git 제외). DB 비밀번호는 `C:\mygit\pjy-dir\.env`의 `PGPASSWORD`에 있음(git 제외, 메모장으로 저장하면 줄 끝 `\r`이 붙으므로 읽을 때 제거해야 함)
 - [ ] **B8. 정리** (2026-11-25 진행: 브리프의 "미검증" 반영 완료. 삭제는 A4·B6 확인 뒤로 보류): 시험 테이블·페이지 삭제 여부를 확인받고 결과를 브리프의 "미검증" 3건에 반영
   - 삭제 후보: `public.spike_memos` 테이블, 시험 페이지 `scattered-notepad-spike`(Vercel 프로젝트와 폴더), `backup/`(필요하면 보관). **삭제 전에 사용자에게 다시 확인합니다.**
@@ -47,7 +49,7 @@
 - [x] **D1. brainstorm**: `concepts_brief.md` 작성(7개 관점 리뷰 포함)
 - [x] **D2. draft**: `/egm:egm-draft` 완료. 모순 2건 해소(iOS도 MVP 지원 대상, PRD·ROADMAP·용어집은 별도 문서 없이 브리프 133행 수정)
 - [x] **D3. 브리프 동기화** (2026-11-25 완료): 오늘의 구현 결정 일곱 개(Next.js 16, 서버 쿠키 세션, JSON 내보내기, `service_role`로 접속 유지 상태 기록, Tailwind CSS 단독, 운영 프로젝트의 시험용 계정으로 e2e, iOS 유지)를 브리프 "Key Decisions"에 추가
-- [ ] **D3a. git 저장소**: `scattered-notepad`(공개, 포트폴리오 겸 다른 PC 작업용). 시험 페이지(`scattered-notepad-spike/`)는 git에서 제외. 첫 커밋 전에 공개되는 문장 확인
+- [x] **D3a. git 저장소** (2026-11-28 확인: `iwasthomas/scattered-notepad`, main 푸시됨): `scattered-notepad`(공개, 포트폴리오 겸 다른 PC 작업용). 시험 페이지(`scattered-notepad-spike/`)는 git에서 제외. 첫 커밋 전에 공개되는 문장 확인
 - [ ] **D4. review (사용자가 직접 입력)**: `/egm:egm-review docs/designs/scattered-notepad.md` (스킬이 사용자 입력으로만 실행됨)
 - [ ] **D5. resolve**: 리뷰 지적 사항을 항목별로 정리하고 반영할지 결정 (`/egm:egm-resolve`)
 - [ ] **D6. 설계 승인**: 사용자가 승인한 뒤에만 구현 시작
